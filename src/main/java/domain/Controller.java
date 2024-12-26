@@ -84,7 +84,6 @@ public class Controller {
     }
 
     public Controller runScript(String script) {
-        // Логика выполнения скрипта
         return this;
     }
 
@@ -104,13 +103,15 @@ public class Controller {
                         double[] values = (double[]) field.get(model);
                         sb.append(fieldName).append("\t");
                         for (double value : values) {
-                            sb.append(value).append("\t");
+                            String formatted = String.format("%.2f", value);
+                            formatted = formatted.replace(",", ".");
+                            sb.append(formatted).append("\t");
                         }
                     } else if (field.getType().getComponentType() == int.class) {
                         int[] intValues = (int[]) field.get(model);
                         sb.append(fieldName).append("\t");
                         for (int value : intValues) {
-                            sb.append(value).append("\t"); // Преобразование int -> double
+                            sb.append(value).append("\t");
                         }
                     }
 
