@@ -3,6 +3,9 @@ package domain;
 import data.Model;
 import data.annotations.Bind;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.reflect.Field;
@@ -58,9 +61,10 @@ public class Controller {
                     } else if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
                         double[] values = data.get(field.getName());
                         if (values == null) {
-                            throw new RuntimeException("Данные для поля '" + field.getName() + "' отсутствуют в входных данных.");
+                            //throw new RuntimeException("Данные для поля '" + field.getName() + "' отсутствуют в входных данных.");
+                            values = new double[LL];
                         }
-                        if (values.length < LL) {
+                        else if (values.length < LL) {
                             double[] extended = new double[LL];
                             System.arraycopy(values, 0, extended, 0, values.length);
                             for (int i = values.length; i < LL; i++) {
@@ -73,7 +77,7 @@ public class Controller {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка чтения данных: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
         return this;
     }
@@ -84,19 +88,73 @@ public class Controller {
     }
 
     public Controller runScript(String script) {
+        try {
+            // Create Groovy engine
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("groovy");
+
+            // Передаём данные модели в движок
+            for (Field field : model.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Bind.class)) {
+                    field.setAccessible(true);
+
+                    // Добавляем массивы и переменные модели в скриптовый движок
+                    if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
+                        engine.put(field.getName(), field.get(model));
+                    } else if (field.getType() == int.class) {
+                        engine.put(field.getName(), field.get(model));
+                    }
+                }
+            }
+
+            // Выполняем скрипт
+            engine.eval(script);
+
+            // Извлекаем данные обратно из движка в модель
+            for (Field field : model.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Bind.class)) {
+                    field.setAccessible(true);
+
+                    // Если поле - массив double[], обновляем его из движка
+                    if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
+                        Object updatedValue = engine.get(field.getName());
+                        if (updatedValue != null) {
+                            field.set(model, updatedValue);
+                        }
+                    }
+                }
+            }
+        } catch (ScriptException | IllegalAccessException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
         return this;
     }
+
+    public Controller runScriptFromFile(String fname) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fname))) {
+            StringBuilder scriptBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                scriptBuilder.append(line).append(System.lineSeparator());
+            }
+            // Выполняем скрипт, переданный в виде строки, с помощью метода runScript
+            return this.runScript(scriptBuilder.toString());
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading script file: " + fname + ". " + e.getMessage());
+        }
+    }
+
+
 
     public String getResultsAsTsv() {
         StringBuilder sb = new StringBuilder();
 
         try {
-            // Обходим все поля модели
             for (Field field : model.getClass().getDeclaredFields()) {
                 if (field.getType().isArray()) {
                     field.setAccessible(true);
 
-                    // Получаем имя переменной и её значения
                     String fieldName = field.getName();
 
                     if (field.getType().getComponentType() == double.class) {
@@ -119,7 +177,7 @@ public class Controller {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при формировании TSV: " + e.getMessage());
+            throw new RuntimeException("Error formatting TSV: " + e.getMessage());
         }
 
         return sb.toString();
