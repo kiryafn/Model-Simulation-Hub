@@ -12,15 +12,15 @@ public class Window extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
         setLayout(new BorderLayout());
-        setVisible(true);
-
 
         // Create panels
-        modelPanel = new ModelPanel(modelsPath);
+        modelPanel = new ModelPanel(modelsPath, dataPath);
         resultPanel = new ResultPanel();
 
         // Add panels to the frame
         add(modelPanel, BorderLayout.WEST);
         add(resultPanel, BorderLayout.CENTER);
+
+        setVisible(true);
     }
 }
