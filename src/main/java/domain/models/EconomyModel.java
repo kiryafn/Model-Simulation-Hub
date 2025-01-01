@@ -20,7 +20,6 @@ public class EconomyModel implements Model{
     @Bind private double[] EXP;     //export
     @Bind private double[] IMP;     //import
     @Bind private double[] GDP;     //Gross domestic product
-    @Bind private double[] ZIND;     //Gross domestic product
 
 
     public EconomyModel() { }
