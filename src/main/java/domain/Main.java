@@ -14,7 +14,7 @@ public class Main {
         String output = c1.getResultsAsTsv();
         System.out.println(output);*/
 
-        SwingUtilities.invokeLater(() -> new Window());
+        SwingUtilities.invokeLater(() -> new Window("./src/main/java/domain/models", ".src/main/resources/data"));
 
     }
 }
