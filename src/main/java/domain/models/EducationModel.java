@@ -5,12 +5,13 @@ import data.annotations.Bind;
 
 public class EducationModel implements Model{
     @Bind private int[] YEARS;      //years [from, to]
+
     @Bind private double[] grSTUD;  //growth rate of students
     @Bind private double[] grTEA;   //growth rate of teachers
+
     @Bind private double[] STUD;    //student's number
     @Bind private double[] TEA;     //teacher's number
-
-    private double[] STUDENT_TEACHER_RATIO;    //students per teacher
+    @Bind private double[] STUDENT_TEACHER_RATIO;    //students per teacher
 
     public EducationModel() { }
 

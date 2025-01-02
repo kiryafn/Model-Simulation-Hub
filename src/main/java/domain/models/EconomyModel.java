@@ -21,7 +21,6 @@ public class EconomyModel implements Model{
     @Bind private double[] IMP;     //import
     @Bind private double[] GDP;     //Gross domestic product
 
-
     public EconomyModel() { }
 
     @Override

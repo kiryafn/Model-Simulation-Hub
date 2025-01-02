@@ -7,10 +7,10 @@ public class ClimateModel implements Model{
     @Bind private int[] YEARS;     //years [from, to]
     @Bind private double[] grCO2;  //CO2 emission growth
     @Bind private double[] grTEMP; //temperature increment growth
+
     @Bind private double[] CO2;    //current CO2 emissions
     @Bind private double[] TEMP;   //temperature change
-
-    private double[] CLIMATE_CHANGE;  //climate change index
+    @Bind private double[] CLIMATE_CHANGE;  //climate change index
 
     public ClimateModel() { }
 

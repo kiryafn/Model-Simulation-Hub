@@ -5,9 +5,6 @@ import data.annotations.Bind;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.reflect.Field;
@@ -16,11 +13,40 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * The {@code Controller} class is responsible for managing and executing various modeling and scripting operations
+ * on a given {@link Model}. It facilitates loading data, executing Groovy scripts, running the model logic, and
+ * exporting results in a tabular format.
+ *
+ * <p>This class supports features like:
+ * <ul>
+ *   <li>Loading data from files into the model</li>
+ *   <li>Running custom Groovy scripts</li>
+ *   <li>Executing the predefined logic of the model</li>
+ *   <li>Exporting the results as tab-separated values (TSV)</li>
+ * </ul>
+ *
+ * <p>It leverages reflection to bind data to fields annotated with {@link Bind}, enabling dynamic interaction
+ * with the model and custom scripts.
+ */
 public class Controller {
-    private Model model;
+    /**
+     * The {@link Model} instance managed by this controller.
+     */
+    private final Model model;
 
-    private Map<String, double[]> scriptVariables = new LinkedHashMap<>();
+    /**
+     * A map storing variables created in Groovy scripts.
+     * The key represents the variable name, and the value is an array of double values associated with the variable.
+     */
+    private final Map<String, double[]> scriptVariables = new LinkedHashMap<>();
 
+    /**
+     * Constructs a {@code Controller} with the specified model name.
+     *
+     * @param modelName the name of the {@link Model} class to instantiate.
+     * @throws RuntimeException if the {@link Model} cannot be created or initialized.
+     */
     public Controller(String modelName) {
         try {
             this.model = (Model) Class.forName("domain.models." + modelName).newInstance();
@@ -29,6 +55,21 @@ public class Controller {
         }
     }
 
+    /**
+     * Reads data from a file and populates the fields in the associated {@link Model}.
+     *
+     * <p>The input file should have data in a specific format, where each line represents a variable name followed by
+     * its values. For example:
+     * <pre>
+     * YEARS  2020 2021 2022
+     * VAR1   1.0  2.0  3.0
+     * VAR2   4.0  5.0  6.0
+     * </pre>
+     *
+     * @param fname the name of the input file from which data is read.
+     * @return the current {@code Controller} instance for method chaining.
+     * @throws RuntimeException if any error occurs while reading the file or binding data to the {@link Model}.
+     */
     public Controller readDataFrom(String fname) {
         try (BufferedReader reader = new BufferedReader(new FileReader(fname))) {
             Map<String, double[]> data = new HashMap<>();
@@ -69,8 +110,7 @@ public class Controller {
                         if (values == null) {
                             //throw new RuntimeException("Данные для поля '" + field.getName() + "' отсутствуют в входных данных.");
                             values = new double[LL];
-                        }
-                        else if (values.length < LL) {
+                        } else if (values.length < LL) {
                             double[] extended = new double[LL];
                             System.arraycopy(values, 0, extended, 0, values.length);
                             for (int i = values.length; i < LL; i++) {
@@ -88,6 +128,14 @@ public class Controller {
         return this;
     }
 
+    /**
+     * Runs the logic encapsulated within the current {@link Model}.
+     *
+     * <p>This method invokes the {@link Model#run()} method, which processes the loaded data based on the model's
+     * predefined computation logic.
+     *
+     * @return the current {@code Controller} instance for method chaining.
+     */
     public Controller runModel() {
         model.run();
         return this;
@@ -150,7 +198,17 @@ public class Controller {
         return this;
     }*/
 
-    public Controller runScript(String script){
+    /**
+     * Executes a Groovy script provided as a string.
+     *
+     * <p>The script has access to all fields annotated with {@link Bind} within the {@link Model}.
+     * Additionally, variables created or updated during script execution are stored in {@code scriptVariables}.
+     *
+     * @param script the Groovy script to execute.
+     * @return the current {@code Controller} instance for method chaining.
+     * @throws RuntimeException if there is any error while executing the script.
+     */
+    public Controller runScript(String script) {
         // Create a Groovy Binding
         Binding binding = new Binding();
 
@@ -170,7 +228,7 @@ public class Controller {
         }
 
         // Bind fields created in scripts
-        for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()){
+        for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()) {
             binding.setVariable(entry.getKey(), entry.getValue());
         }
 
@@ -181,18 +239,25 @@ public class Controller {
         for (var obj : binding.getVariables().entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
 
-            if(entry.getKey().length() < 2 && entry.getKey().matches("[a-z]"))
+            if (entry.getKey().length() < 2 && entry.getKey().matches("[a-z]"))
                 continue;
 
-            if(bindedFieldNames.contains(entry.getKey()))
+            if (bindedFieldNames.contains(entry.getKey()))
                 continue;
 
-            scriptVariables.put(entry.getKey(), (double[])entry.getValue());
+            scriptVariables.put(entry.getKey(), (double[]) entry.getValue());
         }
         //executes the script code specified as a string
         return this;
     }
 
+    /**
+     * Reads a Groovy script from a file and executes it.
+     *
+     * @param fname the name of the file containing the Groovy script.
+     * @return the current {@code Controller} instance for method chaining.
+     * @throws RuntimeException if any error occurs while reading the file or executing the script.
+     */
     public Controller runScriptFromFile(String fname) {
         try (BufferedReader reader = new BufferedReader(new FileReader(fname))) {
             StringBuilder scriptBuilder = new StringBuilder();
@@ -207,8 +272,20 @@ public class Controller {
         }
     }
 
-
-
+    /**
+     * Retrieves the results of the {@link Model} and variables created during script execution in TSV format.
+     *
+     * <p>The output is a string where each row represents a variable, with the variable name followed by a tab-separated
+     * list of values. For example:
+     * <pre>
+     * YEARS   2020  2021  2022
+     * VAR1    1.0   2.0   3.0
+     * VAR2    4.0   5.0   6.0
+     * </pre>
+     *
+     * @return the results in tab-separated values (TSV) format.
+     * @throws RuntimeException if there is any error while formatting the results.
+     */
     public String getResultsAsTsv() {
         StringBuilder sb = new StringBuilder();
 

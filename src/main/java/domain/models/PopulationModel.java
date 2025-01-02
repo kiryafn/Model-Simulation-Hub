@@ -3,14 +3,16 @@ package domain.models;
 import data.Model;
 import data.annotations.Bind;
 
+
 public class PopulationModel implements Model{
     @Bind private int[] YEARS;      //years [from, to]
+
     @Bind private double[] grPOP;   //population growth
     @Bind private double[] grIMM;   //immigration growth
+
     @Bind private double[] POP;     //current population
     @Bind private double[] IMM;     //number of immigrants
-
-    private double[] TOTAL_POP;    //total population after recalculation
+    @Bind private double[] TOTAL_POP;    //total population after recalculation
 
     public PopulationModel() { }
 
