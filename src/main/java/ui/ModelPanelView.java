@@ -15,6 +15,9 @@ public class ModelPanelView extends JPanel implements ModelPanelContract.View {
 
     public ModelPanelView() {
         init();
+        initModelList();
+        initDataList();
+        initRunModelButton();
     }
 
     public void init() {
@@ -23,7 +26,15 @@ public class ModelPanelView extends JPanel implements ModelPanelContract.View {
 
         JLabel title = new JLabel("Select model and data");
         add(title, BorderLayout.NORTH);
+    }
 
+    private void initRunModelButton() {
+        runModelButton = new JButton("Run Model");
+        runModelButton.addActionListener(e -> presenter.onRunModelClicked());
+        add(runModelButton, BorderLayout.SOUTH);
+    }
+
+    private void initModelList() {
         modelList = new JList<>();
         modelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         modelList.addListSelectionListener(e -> {
@@ -32,6 +43,10 @@ public class ModelPanelView extends JPanel implements ModelPanelContract.View {
             }
         });
 
+        add(new JScrollPane(modelList), BorderLayout.WEST);
+    }
+
+    private void initDataList() {
         dataList = new JList<>();
         dataList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dataList.addListSelectionListener(e -> {
@@ -39,13 +54,7 @@ public class ModelPanelView extends JPanel implements ModelPanelContract.View {
                 presenter.onDataSelected(dataList.getSelectedValue());
             }
         });
-
-        runModelButton = new JButton("Run Model");
-        runModelButton.addActionListener(e -> presenter.onRunModelClicked());
-
-        add(new JScrollPane(modelList), BorderLayout.WEST);
         add(new JScrollPane(dataList), BorderLayout.EAST);
-        add(runModelButton, BorderLayout.SOUTH);
     }
 
     @Override
@@ -70,11 +79,11 @@ public class ModelPanelView extends JPanel implements ModelPanelContract.View {
 
     @Override
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override
     public void showModelRunSuccessfully() {
-        JOptionPane.showMessageDialog(this, "Model run successfully" , "Success", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Model run successfully" , "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 }

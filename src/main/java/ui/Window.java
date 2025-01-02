@@ -25,9 +25,7 @@ public class Window extends JFrame {
         ModelPanelPresenter modelPanelPresenter = new ModelPanelPresenter(modelPanelView, new ModelPanelModel());
 
         // Connect ResultPanel MVP components
-        ResultPanelPresenter resultPanelPresenter = new ResultPanelPresenter(
-                resultPanelView, new ResultPanelModel()
-        );
+        ResultPanelPresenter resultPanelPresenter = new ResultPanelPresenter(resultPanelView, new ResultPanelModel());
 
         // Connect panels (when model runs, pass Controller to ResultPanelPresenter)
         modelPanelPresenter.setResultPanelPresenter(resultPanelPresenter);

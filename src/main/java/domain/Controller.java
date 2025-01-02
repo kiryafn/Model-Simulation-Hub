@@ -2,6 +2,8 @@ package domain;
 
 import data.Model;
 import data.annotations.Bind;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -9,11 +11,15 @@ import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Controller {
     private Model model;
+
+    private Map<String, double[]> scriptVariables = new LinkedHashMap<>();
 
     public Controller(String modelName) {
         try {
@@ -87,7 +93,7 @@ public class Controller {
         return this;
     }
 
-    public Controller runScript(String script) {
+    /*public Controller runScript(String script) {
         try {
             // Create Groovy engine
             ScriptEngineManager manager = new ScriptEngineManager();
@@ -107,6 +113,11 @@ public class Controller {
                 }
             }
 
+            // Также передаем переменные из scriptVariables в движок
+            for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()) {
+                engine.put(entry.getKey(), entry.getValue());
+            }
+
             // Выполняем скрипт
             engine.eval(script);
 
@@ -124,10 +135,61 @@ public class Controller {
                     }
                 }
             }
+
+            // Извлекаем обновленные (или добавленные) данные из движка и сохраняем их в scriptVariables
+            for (String varName : engine.getBindings(javax.script.ScriptContext.ENGINE_SCOPE).keySet()) {
+                Object value = engine.get(varName);
+                if (value instanceof double[]) {
+                    scriptVariables.put(varName, (double[]) value);
+                }
+            }
         } catch (ScriptException | IllegalAccessException e) {
             throw new RuntimeException(e.getMessage());
         }
 
+        return this;
+    }*/
+
+    public Controller runScript(String script){
+        // Create a Groovy Binding
+        Binding binding = new Binding();
+
+        // Bind all fields annotated with @Bind to the Groovy script
+        Field[] fields = model.getClass().getDeclaredFields();
+        ArrayList<String> bindedFieldNames = new ArrayList<>();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Bind.class)) {
+                field.setAccessible(true);
+                try {
+                    binding.setVariable(field.getName(), field.get(model));
+                    bindedFieldNames.add(field.getName());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        // Bind fields created in scripts
+        for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()){
+            binding.setVariable(entry.getKey(), entry.getValue());
+        }
+
+        // Create and run the Groovy script
+        GroovyShell shell = new GroovyShell(binding);
+        shell.evaluate(script);
+
+        for (var obj : binding.getVariables().entrySet()) {
+            Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
+
+            if(entry.getKey().length() < 2 && entry.getKey().matches("[a-z]"))
+                continue;
+
+            if(bindedFieldNames.contains(entry.getKey()))
+                continue;
+
+            scriptVariables.put(entry.getKey(), (double[])entry.getValue());
+        }
+        //executes the script code specified as a string
         return this;
     }
 
@@ -175,6 +237,16 @@ public class Controller {
 
                     sb.append("\n");
                 }
+            }
+
+            // Формируем TSV из переменных scriptVariables
+            for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()) {
+                sb.append(entry.getKey()).append("\t");
+                for (double value : entry.getValue()) {
+                    String formatted = String.format("%.2f", value).replace(",", ".");
+                    sb.append(formatted).append("\t");
+                }
+                sb.append("\n");
             }
         } catch (Exception e) {
             throw new RuntimeException("Error formatting TSV: " + e.getMessage());

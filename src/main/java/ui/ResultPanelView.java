@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
 
 public class ResultPanelView extends JPanel implements ResultPanelContract.View {
 
@@ -45,12 +46,16 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
         buttonPanel.add(runScriptButton);
 
         runScriptButton.addActionListener(e -> {
-            String scriptPath = JOptionPane.showInputDialog(this,
-                    "Enter script path:");
-            if (scriptPath != null && !scriptPath.isEmpty()) {
-                presenter.onRunScript(scriptPath);
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.showOpenDialog(this);
+            String selectedScript = fileChooser.getSelectedFile().getAbsolutePath();
+
+            if (selectedScript != null && !selectedScript.isEmpty()) {
+                presenter.onRunScript(selectedScript);
             }
         });
+
+        //===========================================
 
         createScriptButton = new JButton("Create and Run Ad Hoc Script");
         buttonPanel.add(createScriptButton);
