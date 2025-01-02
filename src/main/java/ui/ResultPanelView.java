@@ -13,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.io.File;
 import javax.swing.JFileChooser;
 
 /**
@@ -87,12 +88,16 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
 
         runScriptButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.showOpenDialog(this);
-            String selectedScript = fileChooser.getSelectedFile().getAbsolutePath();
+            fileChooser.setCurrentDirectory(new File("./src/main/resources/scripts"));
+            int result = fileChooser.showOpenDialog(this);
 
-            // Validate the selected file and invoke the presenter's script execution method
-            if (selectedScript != null && !selectedScript.isEmpty()) {
-                presenter.onRunScript(selectedScript);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                String selectedScript = fileChooser.getSelectedFile().getAbsolutePath();
+
+                // Validate the selected file and invoke the presenter's script execution method
+                if (selectedScript != null && !selectedScript.isEmpty()) {
+                    presenter.onRunScript(selectedScript);
+                }
             }
         });
 
