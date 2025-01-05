@@ -2,19 +2,13 @@ package ui;
 
 import data.ResultPanelContract;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import javax.swing.table.JTableHeader;
+import java.awt.*;
 import java.io.File;
-import javax.swing.JFileChooser;
+import data.Palette;
 
 /**
  * The ResultPanelView class is a graphical component for displaying results and executing scripts in a UI.
@@ -66,15 +60,34 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
     public void initResultTable() {
         resultsTable = new JTable();
         resultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        JTableHeader header = resultsTable.getTableHeader();
+        header.setBackground(Palette.HEADER.getColor());
+        header.setFont(header.getFont().deriveFont(Font.BOLD));
+        resultsTable.setTableHeader(header);
 
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
-        resultsTable.setDefaultRenderer(Object.class, rightRenderer);
+        resultsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                if (row % 2 == 0) 
+                    component.setBackground(Palette.EVEN_TABLE_ROW.getColor());
+                else
+                    component.setBackground(Palette.ODD_TABLE_ROW.getColor());
+
+                if (column > 1)
+                    ((JLabel) component).setHorizontalAlignment(SwingConstants.RIGHT);
+                
+                if (isSelected) 
+                    component.setBackground(Palette.SELECTED.getColor());
+
+                return component;
+            }
+        });
 
         JScrollPane tableScrollPane = new JScrollPane(resultsTable);
         add(tableScrollPane, BorderLayout.CENTER);
-
-
     }
 
     /**
