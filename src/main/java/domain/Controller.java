@@ -8,6 +8,7 @@ import groovy.lang.GroovyShell;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,7 +40,7 @@ public class Controller {
      * A map storing variables created in Groovy scripts.
      * The key represents the variable name, and the value is an array of double values associated with the variable.
      */
-    private final Map<String, double[]> scriptVariables = new LinkedHashMap<>();
+    private Map<String, double[]> scriptVariables = new LinkedHashMap<>();
 
     /**
      * Constructs a {@code Controller} with the specified model name.
@@ -210,6 +211,11 @@ public class Controller {
      */
     public Controller runScript(String script) {
         // Create a Groovy Binding
+
+        // The `Binding` object is used in the GroovyShell class
+        // to pass variables and their values into the Groovy script context.
+        // It is a container of named variables that are accessible
+        // within the script.
         Binding binding = new Binding();
 
         // Bind all fields annotated with @Bind to the Groovy script
@@ -236,6 +242,7 @@ public class Controller {
         GroovyShell shell = new GroovyShell(binding);
         shell.evaluate(script);
 
+        //Variables created or modified in the script are retrieved from `binding`.
         for (var obj : binding.getVariables().entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
 
@@ -300,8 +307,13 @@ public class Controller {
                         double[] values = (double[]) field.get(model);
                         sb.append(fieldName).append("\t");
                         for (double value : values) {
-                            String formatted = String.format("%.2f", value);
-                            formatted = formatted.replace(",", ".");
+                            //FORMATING VALUES
+
+                            //String formatted = String.format("%.2f", value);
+                            //formatted = formatted.replace(",", ".");
+
+                            DecimalFormat formatter = new DecimalFormat("#,###.##");
+                            String formatted =  formatter.format(value);
                             sb.append(formatted).append("\t");
                         }
                     } else if (field.getType().getComponentType() == int.class) {
@@ -320,15 +332,23 @@ public class Controller {
             for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()) {
                 sb.append(entry.getKey()).append("\t");
                 for (double value : entry.getValue()) {
-                    String formatted = String.format("%.2f", value).replace(",", ".");
+
+                    DecimalFormat formatter = new DecimalFormat("#,###.##");
+                    String formatted =  formatter.format(value).replace(",", ".");
+
                     sb.append(formatted).append("\t");
                 }
                 sb.append("\n");
             }
+
         } catch (Exception e) {
             throw new RuntimeException("Error formatting TSV: " + e.getMessage());
         }
 
         return sb.toString();
+    }
+
+    public void resetScriptVariables() {
+        scriptVariables = new HashMap<>();
     }
 }

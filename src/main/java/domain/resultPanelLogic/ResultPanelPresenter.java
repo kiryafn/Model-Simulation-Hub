@@ -60,6 +60,7 @@ public class ResultPanelPresenter implements ResultPanelContract.Presenter {
             model.executeScriptFromFile(scriptPath, controller);
             view.notifyScriptExecution("Script executed successfully!");
             updateResultsTable(controller.getResultsAsTsv());
+            controller.resetScriptVariables();
         } catch (Exception e) {
             view.showError("Failed to execute script: " + e.getMessage());
         }

@@ -1,5 +1,6 @@
 package ui;
 
+import data.Pathes;
 import data.ResultPanelContract;
 
 import javax.swing.*;
@@ -60,9 +61,10 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
     public void initResultTable() {
         resultsTable = new JTable();
         resultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        resultsTable.setEnabled(false);
         
         JTableHeader header = resultsTable.getTableHeader();
-        header.setBackground(Palette.HEADER.getColor());
+        header.setBackground(Palette.Header.getColor());
         header.setFont(header.getFont().deriveFont(Font.BOLD));
         resultsTable.setTableHeader(header);
 
@@ -72,15 +74,22 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
                 Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
                 if (row % 2 == 0) 
-                    component.setBackground(Palette.EVEN_TABLE_ROW.getColor());
+                    component.setBackground(Palette.EvenRow.getColor());
                 else
-                    component.setBackground(Palette.ODD_TABLE_ROW.getColor());
+                    component.setBackground(Palette.OddRow.getColor());
 
-                if (column > 1)
-                    ((JLabel) component).setHorizontalAlignment(SwingConstants.RIGHT);
+                // Set text alignment
+                if (component instanceof JLabel) {
+                    JLabel label = (JLabel) component;
+                    if (column == 0) {
+                        label.setHorizontalAlignment(SwingConstants.LEFT); // First column - left alignment
+                    } else {
+                        label.setHorizontalAlignment(SwingConstants.RIGHT); // The rest of the columns are aligned to the right
+                    }
+                }
                 
                 if (isSelected) 
-                    component.setBackground(Palette.SELECTED.getColor());
+                    component.setBackground(Palette.Selected.getColor());
 
                 return component;
             }
@@ -104,7 +113,7 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
 
         runScriptButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new File("./src/main/resources/scripts"));
+            fileChooser.setCurrentDirectory(new File(Pathes.ToScripts.getPath()));
             int result = fileChooser.showOpenDialog(this);
 
             if (result == JFileChooser.APPROVE_OPTION) {
