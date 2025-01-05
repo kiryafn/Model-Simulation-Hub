@@ -13,12 +13,12 @@ import javax.swing.BorderFactory;
 import java.awt.BorderLayout;
 
 /**
- * The ModelPanelView class serves as the UI component for displaying model and data lists,
+ * The SelectionPanelView class serves as the UI component for displaying model and data lists,
  * allowing users to select a model and associated data and execute a model run.
  * The class implements the {@link ModelPanelContract.View} interface to facilitate interaction
  * between the UI and the underlying presenter logic.
  */
-public class ModelPanelView extends JPanel implements ModelPanelContract.View {
+public class SelectionPanelView extends JPanel implements ModelPanelContract.View {
 
     /**
      * The presenter providing the business logic and operations for this view.
@@ -41,10 +41,10 @@ public class ModelPanelView extends JPanel implements ModelPanelContract.View {
     private JButton runModelButton;
 
     /**
-     * Default constructor for the ModelPanelView.
+     * Default constructor for the SelectionPanelView.
      * Sets up the layout and initializes child components for both models and data selection.
      */
-    public ModelPanelView() {
+    public SelectionPanelView() {
         init();
         initModelList();
         initDataList();

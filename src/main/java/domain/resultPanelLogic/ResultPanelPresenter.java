@@ -1,4 +1,4 @@
-package domain.result_panel_logic;
+package domain.resultPanelLogic;
 
 import data.ResultPanelContract;
 import domain.Controller;

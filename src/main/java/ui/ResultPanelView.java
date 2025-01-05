@@ -73,6 +73,8 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
 
         JScrollPane tableScrollPane = new JScrollPane(resultsTable);
         add(tableScrollPane, BorderLayout.CENTER);
+
+
     }
 
     /**
@@ -83,6 +85,7 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1, 2));
 
+        //select script button
         runScriptButton = new JButton("Run Script from File");
         buttonPanel.add(runScriptButton);
 
@@ -101,8 +104,7 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
             }
         });
 
-        //===========================================
-
+        //create script button
         createScriptButton = new JButton("Create and Run Ad Hoc Script");
         buttonPanel.add(createScriptButton);
 

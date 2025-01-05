@@ -1,4 +1,4 @@
-package domain.model_panel_logic;
+package domain.selectionPanelLogic;
 
 import data.ModelPanelContract;
 import data.ResultPanelContract;

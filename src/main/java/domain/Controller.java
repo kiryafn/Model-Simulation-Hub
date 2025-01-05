@@ -49,7 +49,7 @@ public class Controller {
      */
     public Controller(String modelName) {
         try {
-            this.model = (Model) Class.forName("domain.models." + modelName).newInstance();
+            this.model = (Model) Class.forName("data.models." + modelName).newInstance();
         } catch (Exception e) {
             throw new RuntimeException();
         }

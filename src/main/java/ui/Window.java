@@ -1,9 +1,9 @@
 package ui;
 
-import domain.model_panel_logic.ModelPanelModel;
-import domain.model_panel_logic.ModelPanelPresenter;
-import domain.result_panel_logic.ResultPanelModel;
-import domain.result_panel_logic.ResultPanelPresenter;
+import domain.selectionPanelLogic.ModelPanelModel;
+import domain.selectionPanelLogic.ModelPanelPresenter;
+import domain.resultPanelLogic.ResultPanelModel;
+import domain.resultPanelLogic.ResultPanelPresenter;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -20,7 +20,7 @@ public class Window extends JFrame {
     /**
      * The view for the panel that handles model-related logic and user interactions.
      */
-    private final ModelPanelView modelPanelView;
+    private final SelectionPanelView selectionPanelView;
 
     /**
      * The view for the panel that displays the results of the model execution.
@@ -40,10 +40,10 @@ public class Window extends JFrame {
         setLayout(new BorderLayout());
 
         // Create panels
-        modelPanelView = new ModelPanelView();
+        selectionPanelView = new SelectionPanelView();
         resultPanelView = new ResultPanelView();
 
-        ModelPanelPresenter modelPanelPresenter = new ModelPanelPresenter(modelPanelView, new ModelPanelModel());
+        ModelPanelPresenter modelPanelPresenter = new ModelPanelPresenter(selectionPanelView, new ModelPanelModel());
 
         // Connect ResultPanel MVP components
         ResultPanelPresenter resultPanelPresenter = new ResultPanelPresenter(resultPanelView, new ResultPanelModel());
@@ -52,10 +52,10 @@ public class Window extends JFrame {
         modelPanelPresenter.setResultPanelPresenter(resultPanelPresenter);
 
         // Load data
-        modelPanelView.getPresenter().loadModelData(modelsPath, dataPath);
+        selectionPanelView.getPresenter().loadModelData(modelsPath, dataPath);
 
         // Add panels to the frame
-        add(modelPanelView, BorderLayout.WEST);
+        add(selectionPanelView, BorderLayout.WEST);
         add(resultPanelView, BorderLayout.CENTER);
 
         setVisible(true);

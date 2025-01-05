@@ -1,4 +1,4 @@
-package domain.models;
+package data.models;
 
 import data.Model;
 import data.annotations.Bind;
