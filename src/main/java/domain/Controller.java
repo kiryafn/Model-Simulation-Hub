@@ -2,6 +2,7 @@ package domain;
 
 import data.Model;
 import data.annotations.Bind;
+import data.exceptions.NoFieldException;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
@@ -72,14 +73,16 @@ public class Controller {
      * @throws RuntimeException if any error occurs while reading the file or binding data to the {@link Model}.
      */
     public Controller readDataFrom(String fname) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fname))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fname))) { //to close bf automatically
             Map<String, double[]> data = new HashMap<>();
             String line;
             int LL = 0;
             int[] years = null;
 
+            //READING DATA INTO VARIABLES
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
+
                 if (line.startsWith("YEARS")) {
                     String[] parts = line.split("\\s+");
                     LL = parts.length - 1;
@@ -99,6 +102,7 @@ public class Controller {
                 }
             }
 
+            //ASSIGNING DATA TO FIELDS
             for (Field field : model.getClass().getDeclaredFields()) {
                 if (field.isAnnotationPresent(Bind.class)) {
                     field.setAccessible(true);
@@ -109,7 +113,7 @@ public class Controller {
                     } else if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
                         double[] values = data.get(field.getName());
                         if (values == null) {
-                            //throw new RuntimeException("Данные для поля '" + field.getName() + "' отсутствуют в входных данных.");
+                            //throw new NoFieldException("Data for field '" + field.getName() + "' is not present in the input data.");
                             values = new double[LL];
                         } else if (values.length < LL) {
                             double[] extended = new double[LL];
@@ -141,63 +145,6 @@ public class Controller {
         model.run();
         return this;
     }
-
-    /*public Controller runScript(String script) {
-        try {
-            // Create Groovy engine
-            ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName("groovy");
-
-            // Передаём данные модели в движок
-            for (Field field : model.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(Bind.class)) {
-                    field.setAccessible(true);
-
-                    // Добавляем массивы и переменные модели в скриптовый движок
-                    if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
-                        engine.put(field.getName(), field.get(model));
-                    } else if (field.getType() == int.class) {
-                        engine.put(field.getName(), field.get(model));
-                    }
-                }
-            }
-
-            // Также передаем переменные из scriptVariables в движок
-            for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()) {
-                engine.put(entry.getKey(), entry.getValue());
-            }
-
-            // Выполняем скрипт
-            engine.eval(script);
-
-            // Извлекаем данные обратно из движка в модель
-            for (Field field : model.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(Bind.class)) {
-                    field.setAccessible(true);
-
-                    // Если поле - массив double[], обновляем его из движка
-                    if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
-                        Object updatedValue = engine.get(field.getName());
-                        if (updatedValue != null) {
-                            field.set(model, updatedValue);
-                        }
-                    }
-                }
-            }
-
-            // Извлекаем обновленные (или добавленные) данные из движка и сохраняем их в scriptVariables
-            for (String varName : engine.getBindings(javax.script.ScriptContext.ENGINE_SCOPE).keySet()) {
-                Object value = engine.get(varName);
-                if (value instanceof double[]) {
-                    scriptVariables.put(varName, (double[]) value);
-                }
-            }
-        } catch (ScriptException | IllegalAccessException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-
-        return this;
-    }*/
 
     /**
      * Executes a Groovy script provided as a string.

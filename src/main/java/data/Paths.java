@@ -1,13 +1,13 @@
 package data;
 
-public enum Pathes {
+public enum Paths {
     ToModels("./src/main/java/data/models"),
-    ToData("./src/main/resources/data"),
+    ToData("./src/main/resources/data/"),
     ToScripts("./src/main/resources/scripts");
 
     String path;
 
-    Pathes(String path) {
+    Paths(String path) {
         this.path = path;
     }
 

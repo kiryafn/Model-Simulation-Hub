@@ -1,6 +1,6 @@
 package ui;
 
-import data.ModelPanelContract;
+import data.SelectionPanelContract;
 
 import javax.swing.JPanel;
 import javax.swing.JList;
@@ -15,15 +15,15 @@ import java.awt.BorderLayout;
 /**
  * The SelectionPanelView class serves as the UI component for displaying model and data lists,
  * allowing users to select a model and associated data and execute a model run.
- * The class implements the {@link ModelPanelContract.View} interface to facilitate interaction
+ * The class implements the {@link SelectionPanelContract.View} interface to facilitate interaction
  * between the UI and the underlying presenter logic.
  */
-public class SelectionPanelView extends JPanel implements ModelPanelContract.View {
+public class SelectionPanelView extends JPanel implements SelectionPanelContract.View {
 
     /**
      * The presenter providing the business logic and operations for this view.
      */
-    private ModelPanelContract.Presenter presenter;
+    private SelectionPanelContract.Presenter presenter;
 
     /**
      * A list component for displaying available models for user selection.
@@ -105,20 +105,20 @@ public class SelectionPanelView extends JPanel implements ModelPanelContract.Vie
     /**
      * Sets the presenter for this view to enable interaction with business logic.
      *
-     * @param presenter The {@link ModelPanelContract.Presenter} instance to associate with this view.
+     * @param presenter The {@link SelectionPanelContract.Presenter} instance to associate with this view.
      */
     @Override
-    public void setPresenter(ModelPanelContract.Presenter presenter) {
+    public void setPresenter(SelectionPanelContract.Presenter presenter) {
         this.presenter = presenter;
     }
 
     /**
      * Retrieves the currently associated presenter for this view.
      *
-     * @return The {@link ModelPanelContract.Presenter} instance associated with this view.
+     * @return The {@link SelectionPanelContract.Presenter} instance associated with this view.
      */
     @Override
-    public ModelPanelContract.Presenter getPresenter() {
+    public SelectionPanelContract.Presenter getPresenter() {
         return presenter;
     }
 

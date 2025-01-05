@@ -5,7 +5,7 @@ import domain.Controller;
 /**
  * Contract for the Model Panel that defines the interactions between the View, Presenter, and Model.
  */
-public interface ModelPanelContract {
+public interface SelectionPanelContract {
 
     interface View {
         void setPresenter(Presenter presenter);

@@ -1,4 +1,4 @@
-import data.Pathes;
+import data.Paths;
 import ui.Window;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(
-                () -> new Window(Pathes.ToModels.getPath(), Pathes.ToData.getPath())
+                () -> new Window(Paths.ToModels.getPath(), Paths.ToData.getPath())
         );
     }
 }

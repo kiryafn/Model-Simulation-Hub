@@ -1,24 +1,25 @@
 package domain.selectionPanelLogic;
 
-import data.ModelPanelContract;
+import data.SelectionPanelContract;
 import data.ResultPanelContract;
+import data.exceptions.NoFieldException;
 import domain.Controller;
 
 /**
  * Presenter for managing the logic between the ModelPanel view and its underlying data model.
  * It handles user actions, triggers model execution, and updates the ResultPanel with outputs.
  */
-public class ModelPanelPresenter implements ModelPanelContract.Presenter {
+public class ModelPanelPresenter implements SelectionPanelContract.Presenter {
 
     /**
      * The view associated with the ModelPanel, responsible for UI components and feedback.
      */
-    private final ModelPanelContract.View view;
+    private final SelectionPanelContract.View view;
 
     /**
      * The model associated with the ModelPanel, responsible for data operations.
      */
-    private final ModelPanelContract.Model model;
+    private final SelectionPanelContract.Model model;
 
     /**
      * The controller for the selected model, responsible for handling data and executing the model.
@@ -46,7 +47,7 @@ public class ModelPanelPresenter implements ModelPanelContract.Presenter {
      * @param view  The view interface for handling UI operations.
      * @param model The model interface for data-related operations.
      */
-    public ModelPanelPresenter(ModelPanelContract.View view, ModelPanelContract.Model model) {
+    public ModelPanelPresenter(SelectionPanelContract.View view, SelectionPanelContract.Model model) {
         this.view = view;
         this.model = model;
         this.view.setPresenter(this);
@@ -96,7 +97,7 @@ public class ModelPanelPresenter implements ModelPanelContract.Presenter {
             }
 
             view.showModelRunSuccessfully();
-        } catch (Exception e) {
+        } catch (Exception e){
             view.showError("Error running model: " + e.getMessage());
         }
     }

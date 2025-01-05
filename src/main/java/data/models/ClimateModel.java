@@ -4,6 +4,8 @@ import data.Model;
 import data.annotations.Bind;
 
 public class ClimateModel implements Model{
+    @Bind private int LL;           // number of years
+
     @Bind private int[] YEARS;     //years [from, to]
     @Bind private double[] grCO2;  //CO2 emission growth
     @Bind private double[] grTEMP; //temperature increment growth
@@ -16,9 +18,9 @@ public class ClimateModel implements Model{
 
     @Override
     public void run() {
-        CLIMATE_CHANGE = new double[YEARS.length];
+        CLIMATE_CHANGE = new double[LL];
         CLIMATE_CHANGE[0] = CO2[0] + TEMP[0];
-        for (int t = 1; t < YEARS.length; t++) {
+        for (int t = 1; t < LL; t++) {
             CO2[t] = grCO2[t] * CO2[t - 1];
             TEMP[t] = grTEMP[t] * TEMP[t - 1];
             CLIMATE_CHANGE[t] = CO2[t] + TEMP[t];

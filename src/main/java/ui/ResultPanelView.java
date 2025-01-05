@@ -1,6 +1,6 @@
 package ui;
 
-import data.Pathes;
+import data.Paths;
 import data.ResultPanelContract;
 
 import javax.swing.*;
@@ -113,7 +113,7 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
 
         runScriptButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setCurrentDirectory(new File(Pathes.ToScripts.getPath()));
+            fileChooser.setCurrentDirectory(new File(Paths.ToScripts.getPath()));
             int result = fileChooser.showOpenDialog(this);
 
             if (result == JFileChooser.APPROVE_OPTION) {

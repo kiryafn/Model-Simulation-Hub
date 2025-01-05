@@ -1,6 +1,6 @@
 package domain.selectionPanelLogic;
 
-import data.ModelPanelContract;
+import data.SelectionPanelContract;
 import domain.Controller;
 
 import java.io.File;
@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of the {@link ModelPanelContract.Model} interface.
+ * Implementation of the {@link SelectionPanelContract.Model} interface.
  * This class provides functionality for retrieving model and data files
  * from specified directories and creating a {@link Controller} instance.
  */
-public class ModelPanelModel implements ModelPanelContract.Model {
+public class ModelPanelModel implements SelectionPanelContract.Model {
 
     /**
      * Retrieves the list of model files from the specified directory.
@@ -22,7 +22,12 @@ public class ModelPanelModel implements ModelPanelContract.Model {
      */
     @Override
     public String[] getModelFiles(String modelsPath) {
-        return getFilesFromDirectory(modelsPath);
+        String[] modelFiles = getFilesFromDirectory(modelsPath);
+
+        for (int i = 0; i < modelFiles.length; i++)
+            modelFiles[i] = modelFiles[i].replace(".java", "");
+
+        return modelFiles;
     }
 
     /**
