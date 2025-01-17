@@ -1,7 +1,7 @@
 package ui;
 
-import domain.selectionPanelLogic.ModelPanelModel;
-import domain.selectionPanelLogic.ModelPanelPresenter;
+import domain.selectionPanelLogic.SelectionPanelModel;
+import domain.selectionPanelLogic.SelectionPanelPresenter;
 import domain.resultPanelLogic.ResultPanelModel;
 import domain.resultPanelLogic.ResultPanelPresenter;
 
@@ -37,19 +37,20 @@ public class Window extends JFrame {
         setTitle("Modelling Framework");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         // Create panels
         selectionPanelView = new SelectionPanelView();
         resultPanelView = new ResultPanelView();
 
-        ModelPanelPresenter modelPanelPresenter = new ModelPanelPresenter(selectionPanelView, new ModelPanelModel());
+        SelectionPanelPresenter selectionPanelPresenter = new SelectionPanelPresenter(selectionPanelView, new SelectionPanelModel());
 
         // Connect ResultPanel MVP components
         ResultPanelPresenter resultPanelPresenter = new ResultPanelPresenter(resultPanelView, new ResultPanelModel());
 
         // Connect panels (when model runs, pass Controller to ResultPanelPresenter)
-        modelPanelPresenter.setResultPanelPresenter(resultPanelPresenter);
+        selectionPanelPresenter.setResultPanelPresenter(resultPanelPresenter);
 
         // Load data
         selectionPanelView.getPresenter().loadModelData(modelsPath, dataPath);

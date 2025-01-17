@@ -2,14 +2,13 @@ package domain.selectionPanelLogic;
 
 import data.SelectionPanelContract;
 import data.ResultPanelContract;
-import data.exceptions.NoFieldException;
 import domain.Controller;
 
 /**
  * Presenter for managing the logic between the ModelPanel view and its underlying data model.
  * It handles user actions, triggers model execution, and updates the ResultPanel with outputs.
  */
-public class ModelPanelPresenter implements SelectionPanelContract.Presenter {
+public class SelectionPanelPresenter implements SelectionPanelContract.Presenter {
 
     /**
      * The view associated with the ModelPanel, responsible for UI components and feedback.
@@ -42,12 +41,12 @@ public class ModelPanelPresenter implements SelectionPanelContract.Presenter {
     private ResultPanelContract.Presenter resultPanelPresenter;
 
     /**
-     * Constructs a ModelPanelPresenter with the specified view and model.
+     * Constructs a SelectionPanelPresenter with the specified view and model.
      *
      * @param view  The view interface for handling UI operations.
      * @param model The model interface for data-related operations.
      */
-    public ModelPanelPresenter(SelectionPanelContract.View view, SelectionPanelContract.Model model) {
+    public SelectionPanelPresenter(SelectionPanelContract.View view, SelectionPanelContract.Model model) {
         this.view = view;
         this.model = model;
         this.view.setPresenter(this);

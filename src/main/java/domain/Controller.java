@@ -87,34 +87,42 @@ public class Controller {
                     String[] parts = line.split("\\s+");
                     LL = parts.length - 1;
                     years = new int[LL];
+
                     for (int i = 1; i < parts.length; i++) {
                         years[i - 1] = Integer.parseInt(parts[i]);
                     }
+
                     data.put("LL", new double[]{LL});
                 } else {
                     String[] parts = line.split("\\s+");
                     String varName = parts[0];
                     double[] values = new double[parts.length - 1];
+
                     for (int i = 1; i < parts.length; i++) {
                         values[i - 1] = Double.parseDouble(parts[i]);
                     }
+
                     data.put(varName, values);
                 }
             }
 
             //ASSIGNING DATA TO FIELDS
             for (Field field : model.getClass().getDeclaredFields()) {
+
                 if (field.isAnnotationPresent(Bind.class)) {
                     field.setAccessible(true);
+
                     if (field.getName().equals("LL")) {
                         field.set(model, (int) data.get("LL")[0]);
                     } else if (field.getName().equals("YEARS")) {
                         field.set(model, years);
                     } else if (field.getType().isArray() && field.getType().getComponentType() == double.class) {
+
                         double[] values = data.get(field.getName());
                         if (values == null) {
                             //throw new NoFieldException("Data for field '" + field.getName() + "' is not present in the input data.");
                             values = new double[LL];
+                            //if row is not full we extend it with the last value in values array
                         } else if (values.length < LL) {
                             double[] extended = new double[LL];
                             System.arraycopy(values, 0, extended, 0, values.length);
@@ -143,6 +151,7 @@ public class Controller {
      */
     public Controller runModel() {
         model.run();
+        //model.getClass().getDeclaredMethod("run").invoke(model);
         return this;
     }
 
@@ -193,15 +202,17 @@ public class Controller {
         for (var obj : binding.getVariables().entrySet()) {
             Map.Entry<String, Object> entry = (Map.Entry<String, Object>) obj;
 
+            //to delete small variables in the script such as i or j
+            //without this i will have exception because i cant be casted to double[] in *
             if (entry.getKey().length() < 2 && entry.getKey().matches("[a-z]"))
                 continue;
 
             if (bindedFieldNames.contains(entry.getKey()))
                 continue;
-
+                                                //*here
             scriptVariables.put(entry.getKey(), (double[]) entry.getValue());
         }
-        //executes the script code specified as a string
+
         return this;
     }
 
@@ -219,7 +230,7 @@ public class Controller {
             while ((line = reader.readLine()) != null) {
                 scriptBuilder.append(line).append(System.lineSeparator());
             }
-            // Выполняем скрипт, переданный в виде строки, с помощью метода runScript
+            //executes the script code specified as a string
             return this.runScript(scriptBuilder.toString());
         } catch (Exception e) {
             throw new RuntimeException("Error reading script file: " + fname + ". " + e.getMessage());
@@ -245,37 +256,41 @@ public class Controller {
 
         try {
             for (Field field : model.getClass().getDeclaredFields()) {
-                if (field.getType().isArray()) {
-                    field.setAccessible(true);
 
-                    String fieldName = field.getName();
+                if (field.isAnnotationPresent(Bind.class)) {
 
-                    if (field.getType().getComponentType() == double.class) {
-                        double[] values = (double[]) field.get(model);
-                        sb.append(fieldName).append("\t");
-                        for (double value : values) {
-                            //FORMATING VALUES
+                    if (field.getType().isArray()) {
+                        field.setAccessible(true);
 
-                            //String formatted = String.format("%.2f", value);
-                            //formatted = formatted.replace(",", ".");
+                        String fieldName = field.getName();
 
-                            DecimalFormat formatter = new DecimalFormat("#,###.##");
-                            String formatted =  formatter.format(value);
-                            sb.append(formatted).append("\t");
+                        if (field.getType().getComponentType() == double.class) {
+                            double[] values = (double[]) field.get(model);
+                            sb.append(fieldName).append("\t");
+                            for (double value : values) {
+                                //FORMATING VALUES
+
+                                //String formatted = String.format("%.2f", value);
+                                //formatted = formatted.replace(",", ".");
+
+                                DecimalFormat formatter = new DecimalFormat("#,###.##");
+                                String formatted = formatter.format(value);
+                                sb.append(formatted).append("\t");
+                            }
+                        } else if (field.getType().getComponentType() == int.class) {
+                            int[] intValues = (int[]) field.get(model);
+                            sb.append(fieldName).append("\t");
+                            for (int value : intValues) {
+                                sb.append(value).append("\t");
+                            }
                         }
-                    } else if (field.getType().getComponentType() == int.class) {
-                        int[] intValues = (int[]) field.get(model);
-                        sb.append(fieldName).append("\t");
-                        for (int value : intValues) {
-                            sb.append(value).append("\t");
-                        }
+
+                        sb.append("\n");
                     }
-
-                    sb.append("\n");
                 }
             }
 
-            // Формируем TSV из переменных scriptVariables
+            // Form TSV from scriptVariables
             for (Map.Entry<String, double[]> entry : scriptVariables.entrySet()) {
                 sb.append(entry.getKey()).append("\t");
                 for (double value : entry.getValue()) {

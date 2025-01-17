@@ -12,7 +12,7 @@ import java.util.List;
  * This class provides functionality for retrieving model and data files
  * from specified directories and creating a {@link Controller} instance.
  */
-public class ModelPanelModel implements SelectionPanelContract.Model {
+public class SelectionPanelModel implements SelectionPanelContract.Model {
 
     /**
      * Retrieves the list of model files from the specified directory.

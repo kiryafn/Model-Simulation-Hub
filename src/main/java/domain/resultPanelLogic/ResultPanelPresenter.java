@@ -24,7 +24,7 @@ public class ResultPanelPresenter implements ResultPanelContract.Presenter {
      * The controller instance for managing interactions with models via the result panel.
      * (Transmitted via ModelPanel)
      */
-    private Controller controller; //Transmitted via ModelPanelPresenter
+    private Controller controller; //Transmitted via SelectionPanelPresenter
 
     /**
      * Constructor for initializing the ResultPanelPresenter with the provided view and model.
@@ -78,6 +78,7 @@ public class ResultPanelPresenter implements ResultPanelContract.Presenter {
             model.executeAdHocScript(scriptCode, controller);
             view.notifyScriptExecution("Ad-hoc script executed successfully!");
             updateResultsTable(controller.getResultsAsTsv());
+            controller.resetScriptVariables();
         } catch (Exception e) {
             view.showError("Failed to execute ad-hoc script: " + e.getMessage());
         }

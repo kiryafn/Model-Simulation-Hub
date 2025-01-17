@@ -62,10 +62,30 @@ public class ResultPanelView extends JPanel implements ResultPanelContract.View 
         resultsTable = new JTable();
         resultsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         resultsTable.setEnabled(false);
-        
+
+        //Custom header
         JTableHeader header = resultsTable.getTableHeader();
         header.setBackground(Palette.Header.getColor());
         header.setFont(header.getFont().deriveFont(Font.BOLD));
+        
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setHorizontalAlignment(column > 0 ? SwingConstants.CENTER : SwingConstants.LEFT);
+
+                // Add purple color to columns
+                label.setBackground(new Color(31, 99, 179)); // Purple color
+                label.setForeground(Color.WHITE);
+
+                // Add 3D effect
+                label.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(1, 1, 1, 1, Color.DARK_GRAY),
+                        BorderFactory.createRaisedBevelBorder()));
+
+                return label;
+            }
+        });
         resultsTable.setTableHeader(header);
 
         resultsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
